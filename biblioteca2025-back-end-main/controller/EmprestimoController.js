@@ -74,10 +74,7 @@ async function emprestar(req, res) {
     });
 
     // Atualiza o status do livro para emprestado (true)
-    await Livro.update(
-      { emprestado: true },
-      { where: { idlivro } }
-    );
+    await Livro.update({ emprestado: true }, { where: { idlivro } });
 
     return res.json(novoEmprestimo);
   } catch (error) {
@@ -95,27 +92,27 @@ async function devolver(req, res) {
     if (!emprestimoRegistro) {
       return res.status(404).send("Empréstimo não encontrado.");
     }
-    
+
     // Verifica se o empréstimo já foi devolvido
     if (emprestimoRegistro.devolucao) {
       return res.status(422).send("Este empréstimo já foi devolvido.");
     }
-    
+
     // Define a data de devolução
     const data_devolucao = moment().format("YYYY-MM-DD");
-    
+
     // Atualiza o campo "devolucao" do empréstimo
     await Emprestimo.update(
       { devolucao: data_devolucao },
       { where: { idemprestimo } }
     );
-    
+
     // Atualiza o status do livro para disponível (emprestado: false)
     await Livro.update(
       { emprestado: false },
       { where: { idlivro: emprestimoRegistro.idlivro } }
     );
-    
+
     return res.status(200).send("Livro devolvido com sucesso.");
   } catch (error) {
     return res.status(500).send({ error: error.message });
