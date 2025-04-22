@@ -110,4 +110,26 @@ async function demitir(req, res) {
   );
   res.json(respostaBanco);
 }
-export default { listar, selecionar, inserir, alterar, demitir };
+
+async function senha(req, res) {
+  const idfuncionario = req.params.id;
+  const { senha } = req.body;
+  if (senha.length < 6 || senha.length > 20) {
+    return res
+      .status(422)
+      .send(
+        "A senha deve conter no mínimo 6 caracteres e no máximo 20 caracteres."
+      );
+  }
+  const funcionario = await Funcionario.findByPk(idfuncionario);
+  if (!funcionario) {
+    return res.status(404).send("Funcionário não encontrado.");
+  }
+
+  const respostaBanco = await Funcionario.update(
+    { token: null, senha },
+    { where: { idfuncionario } }
+  );
+  res.json(respostaBanco);
+}
+export default { listar, selecionar, inserir, alterar, demitir, senha };
