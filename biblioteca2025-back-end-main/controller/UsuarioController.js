@@ -1,41 +1,64 @@
 import Usuario from "../model/UsuarioModel.js";
 
 async function listar(req, res) {
-    const respostaBanco = await Usuario.findAll();
-    res.json(respostaBanco);
+  const respostaBanco = await Usuario.findAll();
+  res.json(respostaBanco);
 }
 
 async function selecionar(req, res) {
-    const id = req.params.id;
-    const respostaBanco = await Usuario.findByPk(id);
-    res.json(respostaBanco);
+  const id = req.params.id;
+  const respostaBanco = await Usuario.findByPk(id);
+  res.json(respostaBanco);
 }
 
 async function inserir(req, res) {
-    const respostaBanco = await Usuario.create(req.body);
-    res.json(respostaBanco);
+  const respostaBanco = await Usuario.create(req.body);
+  res.json(respostaBanco);
 }
 
 async function alterar(req, res) {
-    const nome = req.body.nome;
-    const cpf = req.body.cpf;
-    const email = req.body.email;
-    const telefone = req.body.telefone;
-    const nascimento = req.body.nascimento;
+  const nome = req.body.nome;
+  const cpf = req.body.cpf;
+  const email = req.body.email;
+  const telefone = req.body.telefone;
+  const nascimento = req.body.nascimento;
 
-    const idusuario = req.params.id;
+  const idusuario = req.params.id;
 
-    const respostaBanco = await Usuario.update(
-        { nome, cpf, email, telefone, nascimento },
-        { where: { idusuario } });
-    res.json(respostaBanco);
+  const respostaBanco = await Usuario.update(
+    { nome, cpf, email, telefone, nascimento },
+    { where: { idusuario } }
+  );
+  res.json(respostaBanco);
 }
 
 async function excluir(req, res) {
-    const idusuario = req.params.id;
+  const idusuario = req.params.id;
 
-    const respostaBanco = await Usuario.destroy({ where: { idusuario } });
-    res.json(respostaBanco);
+  const respostaBanco = await Usuario.destroy({ where: { idusuario } });
+  res.json(respostaBanco);
 }
 
-export default { listar, selecionar, inserir, alterar, excluir };
+async function senha(req, res) {
+  const idusuario = req.params.id;
+  const { senha } = req.body;
+  if (senha.length < 6 || senha.length > 20) {
+    return res
+      .status(422)
+      .send(
+        "A senha deve conter no mínimo 6 caracteres e no máximo 20 caracteres."
+      );
+  }
+  const usuario = await Usuario.findByPk(idusuario);
+  if (!usuario) {
+    return res.status(404).send("Funcionário não encontrado.");
+  }
+
+  const respostaBanco = await Usuario.update(
+    { senha },
+    { where: { idusuario } }
+  );
+  res.json(respostaBanco);
+}
+
+export default { listar, selecionar, inserir, alterar, excluir, senha };

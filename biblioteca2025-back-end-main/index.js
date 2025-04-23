@@ -57,6 +57,7 @@ app.get("/usuario/:id", usuario.selecionar);
 app.post("/usuario", usuario.inserir);
 app.put("/usuario/:id", usuario.alterar);
 app.delete("/usuario/:id", usuario.excluir);
+app.put("/usuario/senha/:id", usuario.senha);
 
 //rotas crud da tabela emprestimo
 app.get("/emprestimo", emprestimo.listar);
