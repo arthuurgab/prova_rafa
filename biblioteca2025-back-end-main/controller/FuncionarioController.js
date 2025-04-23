@@ -1,4 +1,5 @@
 import Funcionario from "../model/FuncionarioModel.js";
+import moment from "moment";
 
 async function listar(req, res) {
   try {
@@ -132,4 +133,36 @@ async function senha(req, res) {
   );
   res.json(respostaBanco);
 }
-export default { listar, selecionar, inserir, alterar, demitir, senha };
+
+async function login(req, res) {
+  const idfuncionario = req.params.id;
+  const { email, senha } = req.body;
+  const token = moment().format("YYYY-MM-DD");
+
+  if (!email) {
+    return res.status(422).send("Email é obrigatório.");
+  }
+
+  if (!senha) {
+    return res.status(422).send("Senha é obrigatório.");
+  }
+
+  const funcionario = await Funcionario.findByPk(idfuncionario);
+  if (!funcionario) {
+    return res.status(404).send("Funcionário não encontrado.");
+  }
+
+  if (email !== funcionario.email || senha !== funcionario.senha) {
+    return res.status(401).send("Email ou senha inválidos.");
+  }
+
+  if (!funcionario.ativo) {
+    return res.status(422).send("Usuario está inativo.");
+  }
+
+  await Funcionario.update({ token: token }, { where: { idfuncionario } });
+
+  res.status(200).send({ token });
+}
+
+export default { listar, selecionar, inserir, alterar, demitir, senha, login };
